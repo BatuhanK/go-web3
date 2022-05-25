@@ -9,12 +9,12 @@ type Client struct {
 	addr      string
 }
 
-func NewClient(addr, proxy string) (*Client, error) {
+func NewClient(addr, proxy string, headers map[string]string) (*Client, error) {
 	c := &Client{
 		addr: addr,
 	}
 
-	t, err := transport.NewTransport(addr, proxy)
+	t, err := transport.NewTransport(addr, proxy, headers)
 	if err != nil {
 		return nil, err
 	}

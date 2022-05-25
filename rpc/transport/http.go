@@ -24,7 +24,7 @@ type HTTP struct {
 	headers map[string]string
 }
 
-func newHTTP(addr string, proxy string) *HTTP {
+func newHTTP(addr string, proxy string, headers map[string]string) *HTTP {
 	if len(proxy) == 0 {
 		return &HTTP{
 			addr: addr,
@@ -33,6 +33,7 @@ func newHTTP(addr string, proxy string) *HTTP {
 					return fasthttp.DialTimeout(addr, dialTimeout)
 				},
 			},
+			headers: headers,
 		}
 	}
 
@@ -42,6 +43,7 @@ func newHTTP(addr string, proxy string) *HTTP {
 		client: &fasthttp.Client{
 			Dial: httpProxyDialer(proxy, dialTimeout),
 		},
+		headers: headers,
 	}
 }
 
