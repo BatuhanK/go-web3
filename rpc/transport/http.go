@@ -90,7 +90,11 @@ func (h *HTTP) Call(method string, out interface{}, params ...interface{}) error
 	req.SetRequestURI(h.addr)
 	if len(h.headers) != 0 {
 		for k, v := range h.headers {
-			req.Header.Add(k, v)
+			if strings.EqualFold(k, "user-agent") {
+				req.Header.SetUserAgent(v)
+			} else {
+				req.Header.Add(k, v)
+			}
 		}
 	}
 	req.Header.SetMethod("POST")
