@@ -21,6 +21,18 @@ func NewClient(addr, proxy string) (*Client, error) {
 	c.transport = t
 	return c, nil
 }
+func NewClientWithHeaders(addr string, headers map[string]string) (*Client, error) {
+	c := &Client{
+		addr: addr,
+	}
+
+	t, err := transport.NewTransportWithHeaders(addr, headers)
+	if err != nil {
+		return nil, err
+	}
+	c.transport = t
+	return c, nil
+}
 
 func (c *Client) Close() error {
 	return c.transport.Close()

@@ -28,3 +28,13 @@ func NewTransport(url, proxy string) (Transport, error) {
 	}
 	return newHTTP(url, proxy), nil
 }
+
+func NewTransportWithHeaders(url string, headers map[string]string) (Transport, error) {
+	if strings.HasPrefix(url, wsPrefix) || strings.HasPrefix(url, wssPrefix) {
+		return newWebsocket(url)
+	}
+	if _, err := os.Stat(url); !os.IsNotExist(err) {
+		return newIPC(url)
+	}
+	return newHTTPWithHeaders(url, headers), nil
+}

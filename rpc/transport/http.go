@@ -18,12 +18,13 @@ var (
 )
 
 type HTTP struct {
-	addr   string
-	proxy  string
-	client *fasthttp.Client
+	addr    string
+	proxy   string
+	client  *fasthttp.Client
+	headers map[string]string
 }
 
-func newHTTP(addr, proxy string) *HTTP {
+func newHTTP(addr string, proxy string) *HTTP {
 	if len(proxy) == 0 {
 		return &HTTP{
 			addr: addr,
@@ -42,6 +43,19 @@ func newHTTP(addr, proxy string) *HTTP {
 			Dial: httpProxyDialer(proxy, dialTimeout),
 		},
 	}
+}
+
+func newHTTPWithHeaders(addr string, headers map[string]string) *HTTP {
+	return &HTTP{
+		addr: addr,
+		client: &fasthttp.Client{
+			Dial: func(addr string) (net.Conn, error) {
+				return fasthttp.DialTimeout(addr, dialTimeout)
+			},
+		},
+		headers: headers,
+	}
+
 }
 
 func (h *HTTP) Close() error {
@@ -72,6 +86,11 @@ func (h *HTTP) Call(method string, out interface{}, params ...interface{}) error
 	defer fasthttp.ReleaseResponse(res)
 
 	req.SetRequestURI(h.addr)
+	if len(h.headers) != 0 {
+		for k, v := range h.headers {
+			req.Header.Add(k, v)
+		}
+	}
 	req.Header.SetMethod("POST")
 	req.Header.SetContentType("application/json")
 	req.SetBody(raw)
